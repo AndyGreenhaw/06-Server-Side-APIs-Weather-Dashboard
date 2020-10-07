@@ -1,0 +1,44 @@
+h1 {
+    text-align: center;
+    font-size: 50px;
+}
+
+h3 {
+    font-size: 26px;
+}
+
+
+#navBar {
+    text-align: center;
+}
+
+#searchButton {
+    width: 15%;
+    color: white;
+    background-color: royalblue;
+}
+
+#searchInput {
+    width:85%;
+}
+
+#recentSearchHeadline {
+    text-align: center;
+    margin-top: 50px;
+}
+
+#navBar {
+    text-align:left;
+}
+
+#recentSearchButton {
+    text-align: center;
+    color: white;
+
+    margin-top: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 80%;
+    
+    background-color: royalblue;
+}
