@@ -86,110 +86,105 @@ function searchButtonFunction(e){
     console.log(ajaxRequest);
     console.log(response);
 
-            // Set Up Array for Recent Searches
-            var recentSearchArray = [];
-            console.log(recentSearchArray);
-                        recentSearchArray.push(ajaxRequest);
-            console.log(ajaxRequest);
+       
+        var recentSearchButton = $("<button>").attr("id", "recentSearchButton")
+        recentSearchButton.text(ajaxRequest);
+        recentSearchSection.append(recentSearchButton);
 
-            //Create List of Buttons for Recent Searches
-            for( var i=0 ; i<recentSearchArray.length ; i++){
-                var recentSearchButton = $("<button>").attr("id", "recentSearchButton")
-                recentSearchButton.text(recentSearchArray[i]);
-                recentSearchSection.append(recentSearchButton);
-                console.log(recentSearchArray[i])
-            }
+    $("#navBar").on("click", function(e){
+        e.preventDefault;
 
-            $("#navBar").on("click", function(e){
-                e.preventDefault;
+        if (e.target.matches("button")){
+            ajaxRequest = e.target.textContent
+            console.log(ajaxRequest)
+            searchButtonFunction(e);
+        };
 
-                if (e.target.matches("button")){
-                    ajaxRequest = e.target.textContent
-                    console.log(ajaxRequest)
-                    searchButtonFunction(e);
-                };
+    })
 
-            })
+        // Collect Weather Icon, Temperature, Humidity and Wind Speed
+        cityName = ajaxRequest;
+        weatherIconCode = response.weather[0].icon;
+        tempNow = response.main.temp;
+        humidNow = response.main.humidity;
+        windNow = response.wind.speed;
 
-            // Collect Weather Icon, Temperature, Humidity and Wind Speed
-            cityName = ajaxRequest;
-            weatherIconCode = response.weather[0].icon;
-            tempNow = response.main.temp;
-            humidNow = response.main.humidity;
-            windNow = response.wind.speed;
+        // Send Data to Local Storage
+        localStorage.setItem("weatherIconCode", JSON.stringify(weatherIconCode));
+        localStorage.setItem("tempNow", JSON.stringify(tempNow));
+        localStorage.setItem("humidNow", JSON.stringify(humidNow));
+        localStorage.setItem("windNow", JSON.stringify(windNow));
+        localStorage.setItem("cityName", JSON.stringify(ajaxRequest));
 
-            // Send Data to Local Storage
-            localStorage.setItem("weatherIconCode", JSON.stringify(weatherIconCode));
-            localStorage.setItem("tempNow", JSON.stringify(tempNow));
-            localStorage.setItem("humidNow", JSON.stringify(humidNow));
-            localStorage.setItem("windNow", JSON.stringify(windNow));
-            localStorage.setItem("cityName", JSON.stringify(ajaxRequest));
+        //Collect City Coordinates for for Second Ajax Request to GET UV Index
+        latC = response.coord.lat;
+        lonC = response.coord.lon;
 
-            //Collect City Coordinates for for Second Ajax Request to GET UV Index
-            latC = response.coord.lat;
-            lonC = response.coord.lon;
+        // Set Up Request for UV Index at City Coordinates
+        var cityCoordinates = "http://api.openweathermap.org/data/2.5/uvi?lat=" + latC + "&lon=" + lonC + "&appid=" + apiKey;
 
-            // Set Up Request for UV Index at City Coordinates
-            var cityCoordinates = "http://api.openweathermap.org/data/2.5/uvi?lat=" + latC + "&lon=" + lonC + "&appid=" + apiKey;
-
-            $.ajax({
-                url: cityCoordinates,
-                method: "GET"
+        $.ajax({
+            url: cityCoordinates,
+            method: "GET"
+        
+            }).then(function(response) {
             
-                }).then(function(response) {
-                
-                // Collect UVIndex and Send to Storage
-                uvIndex = response.value;
-                localStorage.setItem("uvIndex", JSON.stringify(uvIndex));
+            // Collect UVIndex and Send to Storage
+            uvIndex = response.value;
+            localStorage.setItem("uvIndex", JSON.stringify(uvIndex));
 
 /////////////////////////////////////
 // CREATE PRIMARY ELEMENTS OF PAGE //
 /////////////////////////////////////
 
-                // Set Dates
-                //var currentDate = (moment().format("dddd, MMMM Do YYYY"));
-                //console.log(currentDate)
+            primarySection.empty()
+            tempDisplay.empty()
+            humidDisplay.empty()
+            windDisplay.empty()
+            uvDisplay.empty()
+            
+            var cityHeadline = $("<h2>")
+            cityHeadline.text(cityName)
+            primarySection.append(cityHeadline);
+            
+            weatherIcon = $("<img>").attr("src", "http://openweathermap.org/img/w/" + weatherIconCode + ".png")
+            weatherIcon.attr("id", "weatherIcon");
+            cityHeadline.after(weatherIcon)
+            
+            var tempHeadline = $("<h4>");
+            tempHeadline.text("Temperature: " + tempNow + "° Fahrenheit");
+            tempDisplay.append(tempHeadline);
+            console.log(tempNow);
 
-                //Build Headline
-                
-                var cityHeadline = $("<h2>")
-                cityHeadline.text(cityName)
-                primarySection.append(cityHeadline);
-                
-                weatherIcon = $("<img>").attr("src", "http://openweathermap.org/img/w/" + weatherIconCode + ".png")
-                weatherIcon.attr("id", "weatherIcon");
-                cityHeadline.after(weatherIcon)
-                
-                var tempHeadline = $("<h4>");
-                tempHeadline.text("Temperature: " + tempNow + "° Fahrenheit");
-                tempDisplay.append(tempHeadline);
-                console.log(tempNow);
+            var humidHeadline = $("<h4>");
+            humidHeadline.text("Humidity: " + humidNow + "%");
+            humidDisplay.append(humidHeadline);
+            console.log(humidNow);
 
-                var humidHeadline = $("<h4>");
-                humidHeadline.text("Humidity: " + humidNow + "%");
-                humidDisplay.append(humidHeadline);
-                console.log(humidNow);
+            var windHeadline = $("<h4>");
+            windHeadline.text("Wind Speed: " + windNow + "MPH");
+            windDisplay.append(windHeadline);
+            console.log(uvIndex);
 
-                var windHeadline = $("<h4>");
-                windHeadline.text("Wind Speed: " + windNow + "MPH");
-                windDisplay.append(windHeadline);
-                console.log(uvIndex);
-
-                var uvHeadline = $("<h4>");
-                uvHeadline.text("UV Index: " + uvIndex);
-                uvDisplay.append(uvHeadline);
-                console.log(uvIndex);
+            var uvHeadline = $("<h4>");
+            uvHeadline.text("UV Index: " + uvIndex);
+            uvDisplay.append(uvHeadline);
+            console.log(uvIndex);
+ 
+            });
 
 ///////////////////////////
 // COLLECT FORECAST DATA //
 ///////////////////////////
 
-
-            });
-
             // Place Ajax Request in Query URL
             var queryURL = "http://api.openweathermap.org/data/2.5/forecast?q=" + cityName + "&units=imperial" + "&appid=" + apiKey;
 
+            day1.empty()
+            day2.empty()
+            day3.empty()
+            day4.empty()
+            day5.empty()
 
             $.ajax({
             url: queryURL,
@@ -199,15 +194,21 @@ function searchButtonFunction(e){
             console.log(ajaxRequest);
             console.log(response);
 
-            allForecastIcons=[];
-            allForecastTemps=[];
-            allForecastHumidity=[];
+                allForecastIcons=[];
+                allForecastTemps=[];
+                allForecastHumidity=[];
             
             for(var i =0; i<6 ; i++){     
+                
                 allForecastTemps.push(response.list[i].main.temp);
                 allForecastHumidity.push(response.list[i].main.humidity);
                 allForecastIcons.push(response.list[i].weather[0].icon);
-                }
+
+                localStorage.setItem("forecastTemp" + i, JSON.stringify((response.list[i].main.temp))) 
+                localStorage.setItem("forecastHumidity" + i, JSON.stringify((response.list[i].main.humidity))) 
+                localStorage.setItem("forecastIcon" + i, JSON.stringify((response.list[i].weather[0].icon))) 
+
+            }
             
 
 //////////////////////////////////
@@ -216,18 +217,19 @@ function searchButtonFunction(e){
 
             for(var i=0; i<6; i++){
 
-                day1Icon = $("<img>").attr("src", "http://openweathermap.org/img/w/" + allForecastIcons[i] + ".png")
+                forecastIcon = $("<img>").attr("src", "http://openweathermap.org/img/w/" + allForecastIcons[i] + ".png")
                 console.log(allForecastIcons[i])
-                day1Icon.attr("class", "dailyIcons");
-                $("#day"+ i) .append(day1Icon)
+                forecastIcon.attr("class", "dailyIcons");
+                $("#day"+ i) .append(forecastIcon)
 
-                day1Temp = $("<h5>")
-                day1Temp.text("Temp: " + allForecastTemps[i] + "° F")
-                $("#day" + i).append(day1Temp);
+                forecastTemp = $("<h5>")
+                forecastTemp.text("Temp: " + allForecastTemps[i] + "° F")
+                $("#day" + i).append(forecastTemp);
         
-                day1Humidity = $("<h5>");
-                day1Humidity.text("Humidity: " + allForecastHumidity[i] + "%");
-                $("#day" + i).append(day1Humidity);
+                forecastHumidity = $("<h5>");
+                forecastHumidity.text("Humidity: " + allForecastHumidity[i] + "%");
+                $("#day" + i).append(forecastHumidity);
+
 
             };
             
@@ -242,10 +244,10 @@ function searchButtonFunction(e){
 // AUTO LOAD //
 /////////////////////////////////
 
-// Store Data from Local Storage Into Variables
+// Get Data from Local Storage Into Variables
 var storedCity = JSON.parse(localStorage.getItem("cityName"));
 console.log(storedCity);
-var storedWeatherNow = JSON.parse(localStorage.getItem("weatherIcon"));
+var storedWeatherNow = JSON.parse(localStorage.getItem("weatherIconCode"));
 console.log(storedWeatherNow);
 var storedTempNow = JSON.parse(localStorage.getItem("tempNow"));
 console.log(storedTempNow);
@@ -257,12 +259,12 @@ var storedUVNow = JSON.parse(localStorage.getItem("uvIndex"));
 console.log(storedUVNow);
 
 
-
 var openingCityHeadline = $("<h2>")
 openingCityHeadline.text(storedCity)
 primarySection.append(openingCityHeadline);
 
 var openingweatherIcon = $("<img>").attr("src", "http://openweathermap.org/img/w/" + storedWeatherNow + ".png")
+console.log("STN " + storedWeatherNow)
 openingweatherIcon.attr("id", "weatherIcon");
 openingCityHeadline.after(openingweatherIcon)
 
@@ -286,11 +288,5 @@ openinguvHeadline.text("UV Index: " + storedUVNow);
 uvDisplay.append(openinguvHeadline);
 console.log(uvIndex);
 
-
-
-
-cityHeadline
-weatherIcon
-tempHeadline
 
 });
