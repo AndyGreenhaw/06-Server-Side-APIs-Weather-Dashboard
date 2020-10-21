@@ -4,6 +4,7 @@ $(document).ready(function(){
 ////////////////////////////////
 
 var city = "Denver";
+var searchArray = [];
 var apiKey = "e7d65f8500681df1e3559a6964e703f1";
 
 ///////////////////////////////
@@ -194,9 +195,9 @@ function searchButtonFunction(e){
             console.log(ajaxRequest);
             console.log(response);
 
-                allForecastIcons=[];
-                allForecastTemps=[];
-                allForecastHumidity=[];
+            var allForecastIcons=[];
+            var allForecastTemps=[];
+            var allForecastHumidity=[];
             
             for(var i =0; i<6 ; i++){     
                 
@@ -204,32 +205,22 @@ function searchButtonFunction(e){
                 allForecastHumidity.push(response.list[i].main.humidity);
                 allForecastIcons.push(response.list[i].weather[0].icon);
 
-                localStorage.setItem("forecastTemp" + i, JSON.stringify((response.list[i].main.temp))) 
-                localStorage.setItem("forecastHumidity" + i, JSON.stringify((response.list[i].main.humidity))) 
-                localStorage.setItem("forecastIcon" + i, JSON.stringify((response.list[i].weather[0].icon))) 
-
-            }
-            
-
 //////////////////////////////////
 // CREATE FORECAST WEATHER PAGE //
 //////////////////////////////////
 
-            for(var i=0; i<6; i++){
-
-                forecastIcon = $("<img>").attr("src", "http://openweathermap.org/img/w/" + allForecastIcons[i] + ".png")
+                var forecastIcon = $("<img>").attr("src", "http://openweathermap.org/img/w/" + allForecastIcons[i] + ".png")
                 console.log(allForecastIcons[i])
                 forecastIcon.attr("class", "dailyIcons");
                 $("#day"+ i) .append(forecastIcon)
 
-                forecastTemp = $("<h5>")
+                var forecastTemp = $("<h5>")
                 forecastTemp.text("Temp: " + allForecastTemps[i] + "° F")
                 $("#day" + i).append(forecastTemp);
         
-                forecastHumidity = $("<h5>");
+                var forecastHumidity = $("<h5>");
                 forecastHumidity.text("Humidity: " + allForecastHumidity[i] + "%");
                 $("#day" + i).append(forecastHumidity);
-
 
             };
             
@@ -242,51 +233,118 @@ function searchButtonFunction(e){
     
 /////////////////////////////////
 // AUTO LOAD //
-/////////////////////////////////
+///////////////
 
 // Get Data from Local Storage Into Variables
 var storedCity = JSON.parse(localStorage.getItem("cityName"));
 console.log(storedCity);
-var storedWeatherNow = JSON.parse(localStorage.getItem("weatherIconCode"));
-console.log(storedWeatherNow);
-var storedTempNow = JSON.parse(localStorage.getItem("tempNow"));
-console.log(storedTempNow);
-var storedHumidNow = JSON.parse(localStorage.getItem("humidNow"));
-console.log(storedHumidNow);
-var storedWindNow = JSON.parse(localStorage.getItem("windNow"));
-console.log(storedWindNow);
-var storedUVNow = JSON.parse(localStorage.getItem("uvIndex"));
-console.log(storedUVNow);
 
+var autoURL = "http://api.openweathermap.org/data/2.5/weather?q=" + storedCity + "&units=imperial" + "&appid=" + apiKey;
 
-var openingCityHeadline = $("<h2>")
-openingCityHeadline.text(storedCity)
-primarySection.append(openingCityHeadline);
+$.ajax({
+    url: autoURL,
+    method: "GET"     
 
-var openingweatherIcon = $("<img>").attr("src", "http://openweathermap.org/img/w/" + storedWeatherNow + ".png")
-console.log("STN " + storedWeatherNow)
-openingweatherIcon.attr("id", "weatherIcon");
-openingCityHeadline.after(openingweatherIcon)
+    }).then(function(response) {
 
-var openingtempHeadline = $("<h4>");
-openingtempHeadline.text("Temperature: " + storedTempNow + "° Fahrenheit");
-tempDisplay.append(openingtempHeadline);
-console.log(tempNow);
+        // Collect Weather Icon, Temperature, Humidity and Wind Speed
+        storedWeatherNow = response.weather[0].icon;
+        storedTempNow = response.main.temp;
+        storedHumidNow = response.main.humidity;
+        storedWindNow = response.wind.speed; 
 
-var openinghumidHeadline = $("<h4>");
-openinghumidHeadline.text("Humidity: " + storedHumidNow + "%");
-humidDisplay.append(openinghumidHeadline);
-console.log(humidNow);
+        //Collect City Coordinates for for Second Ajax Request to GET UV Index
+        latC = response.coord.lat;
+        lonC = response.coord.lon;
 
-var openingwindHeadline = $("<h4>");
-openingwindHeadline.text("Wind Speed: " + storedWindNow + "MPH");
-windDisplay.append(openingwindHeadline);
-console.log(uvIndex);
+        // Set Up Request for UV Index at City Coordinates
+        var cityCoordinates = "http://api.openweathermap.org/data/2.5/uvi?lat=" + latC + "&lon=" + lonC + "&appid=" + apiKey;
 
-var openinguvHeadline = $("<h4>");
-openinguvHeadline.text("UV Index: " + storedUVNow);
-uvDisplay.append(openinguvHeadline);
-console.log(uvIndex);
+    $.ajax({
+        url: cityCoordinates,
+        method: "GET"
 
+        }).then(function(response) {
 
-});
+            // Collect UVIndex
+            storedUVNow = response.value;
+
+            var openingCityHeadline = $("<h2>")
+            openingCityHeadline.text(storedCity)
+            primarySection.append(openingCityHeadline);
+
+            var openingweatherIcon = $("<img>").attr("src", "http://openweathermap.org/img/w/" + storedWeatherNow + ".png")
+            console.log("STN " + storedWeatherNow)
+            openingweatherIcon.attr("id", "weatherIcon");
+            openingCityHeadline.after(openingweatherIcon)
+
+            var openingtempHeadline = $("<h4>");
+            openingtempHeadline.text("Temperature: " + storedTempNow + "° Fahrenheit");
+            tempDisplay.append(openingtempHeadline);
+
+            var openinghumidHeadline = $("<h4>");
+            openinghumidHeadline.text("Humidity: " + storedHumidNow + "%");
+            humidDisplay.append(openinghumidHeadline);
+
+            var openingwindHeadline = $("<h4>");
+            openingwindHeadline.text("Wind Speed: " + storedWindNow + "MPH");
+            windDisplay.append(openingwindHeadline);
+
+            var openinguvHeadline = $("<h4>");
+            openinguvHeadline.text("UV Index: " + storedUVNow);
+            uvDisplay.append(openinguvHeadline);
+
+        })
+
+    })
+
+///////////////////////////
+// COLLECT FORECAST DATA //
+///////////////////////////
+
+    // Place StoredCity Request in Query URL
+    var autoForecastURL = "http://api.openweathermap.org/data/2.5/forecast?q=" + storedCity + "&units=imperial" + "&appid=" + apiKey;
+
+    day1.empty()
+    day2.empty()
+    day3.empty()
+    day4.empty()
+    day5.empty()
+
+    $.ajax({
+    url: autoForecastURL,
+    method: "GET"     
+
+    }).then(function(response) {
+
+        var storedForecastIcons=[];
+        var storedForecastTemps=[];
+        var storedForecastHumidities=[];
+    
+        for(var i =0; i<6 ; i++){     
+            
+            storedForecastTemps.push(response.list[i].main.temp);
+            storedForecastHumidities.push(response.list[i].main.humidity);
+            storedForecastIcons.push(response.list[i].weather[0].icon);
+
+        //////////////////////////////////
+        // CREATE FORECAST WEATHER PAGE //
+        //////////////////////////////////
+
+            storedForecastIcon = $("<img>").attr("src", "http://openweathermap.org/img/w/" + storedForecastIcons[i] + ".png")
+            console.log(storedForecastIcons[i])
+            storedForecastIcon.attr("class", "dailyIcons");
+            $("#day"+ i) .append(storedForecastIcon)
+
+            storedForecastTemp = $("<h5>")
+            storedForecastTemp.text("Temp: " + storedForecastTemps[i] + "° F")
+            $("#day" + i).append(storedForecastTemp);
+
+            storedForecastHumidity = $("<h5>");
+            storedForecastHumidity.text("Humidity: " + storedForecastHumidities[i] + "%");
+            $("#day" + i).append(storedForecastHumidity);
+        }
+
+    })
+
+})
