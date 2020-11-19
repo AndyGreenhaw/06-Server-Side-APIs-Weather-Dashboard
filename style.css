@@ -3,7 +3,7 @@ html {
     background: url("./images/andy-mountains.jpg");
   
     /* Set a specific height */
-    height: 100%;
+    width: 100%;
   
     /* Create the parallax scrolling effect */
     background-attachment: fixed;
@@ -60,11 +60,11 @@ h5 {
 }
 
 .primary {
-    color: royalblue;
+    color: rgba(17, 29, 66, 0.9);
 
-    padding-top: 10px;
+    padding-top: 20px;
     padding-left: 50px;
-    padding-bottom: 10px;
+    padding-bottom: 0px;
 }
 
 #primary {
@@ -89,7 +89,7 @@ h5 {
 #date {
     font-size: 24px;
     color:white;
-    margin-top: -55px;
+    margin-top: -60px;
     padding-left: 50px;
 }
 

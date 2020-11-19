@@ -12,16 +12,39 @@ var apiKeyGPlaces = "AIzaSyAKHWOvN9T62JBiCFcnwoIDCJB0jZfxnJk";
 // ESTABLISH TIME //
 ////////////////////
 
-var today = new Date();
-console.log(today)
+var todayFullDate = new Date();
+console.log(todayFullDate)
 
-var dd = today.getDate();
-var mm = today.getMonth();
-var yyyy = today.getFullYear();
+var dd = todayFullDate.getDate();
+var mm = todayFullDate.getMonth();
+var yyyy = todayFullDate.getFullYear();
+var dayName = todayFullDate.getDay();
 
-if (dd<10) {dd='0' +dd}
+// Format Days
 
-// if (mm<10) { mm='0'+mm}
+
+switch(dayName) {
+    case 0:
+        dayName = "Sunday";
+        break;
+    case 1:
+        dayName = "Monday";
+        break;
+    case 2:
+        dayName = "Tuesday";
+        break;
+    case 3:
+        dayName = "Wednesday";
+        break;
+    case 4:
+        dayName = "Thursday";
+        break;
+    case 5:
+        dayName = "Friday";
+        break;
+    case 6: 
+        dayName = "Saturday";
+}
 
 // Format Months
 switch(mm) {
@@ -62,14 +85,14 @@ switch(mm) {
         mm = "Dec";
 } 
 
-todayDisplay = mm+' '+dd+', '+yyyy;
+todayDisplay = dayName+', '+mm+' '+dd+', '+yyyy;
 console.log(todayDisplay)
-today = mm+'/'+dd+'/'+yyyy;
-console.log(today);
-today = dd+'-'+mm+'-'+yyyy;
-console.log(today);
-today = dd+'/'+mm+'/'+yyyy;
-console.log(today);
+// today = mm+'/'+dd+'/'+yyyy;
+// console.log(today);
+// today = dd+'-'+mm+'-'+yyyy;
+// console.log(today);
+// today = dd+'/'+mm+'/'+yyyy;
+// console.log(today);
 
 ///////////////////////////////
 // ESTABLISH GLOBAL VARIABLES//
@@ -92,6 +115,7 @@ var currentDate;
 // LINK HTML SECTIONS TO VARIABLES //
 /////////////////////////////////////
 
+var backgroundImage = $("#html")
 var headDiv = $("#head");
 var primarySection = $("#primary");
 var date = $("#date");
@@ -138,6 +162,16 @@ function searchClick(e) {
     e.preventDefault;
     
     ajaxRequest = $("#searchInput").val();
+    
+    // switch(ajaxRequest) {
+    //     case "Denver":
+    //         html.style.background = "url('./images/background/day/denver-day.jpg')";
+    //         break;
+    //     case "Lawrence":
+    //         html.style.background = "url('./images/background/day/lawrence-day.jpg')";
+            
+    // }
+
     searchButtonFunction()
 }
 
@@ -161,8 +195,7 @@ function searchButtonFunction(e){
 ////////////////////////////////////
 
     // Place Ajax Request in Query URL
-    var queryURL = "http://api.openweathermap.org/data/2.5/weather?q=" + ajaxRequest + "&units=imperial" + "&appid=" + apiKey;
-    
+    var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + ajaxRequest + "&units=imperial" + "&appid=" + apiKey;
     
     $.ajax({
     url: queryURL,
@@ -196,7 +229,7 @@ function searchButtonFunction(e){
         lonC = response.coord.lon;
 
         // Set Up Request for UV Index at City Coordinates
-        var cityCoordinates = "http://api.openweathermap.org/data/2.5/uvi?lat=" + latC + "&lon=" + lonC + "&appid=" + apiKey;
+        var cityCoordinates = "https://api.openweathermap.org/data/2.5/uvi?lat=" + latC + "&lon=" + lonC + "&appid=" + apiKey;
 
         $.ajax({
             url: cityCoordinates,
@@ -258,7 +291,7 @@ function searchButtonFunction(e){
 ///////////////////////////
 
             // Place Ajax Request in Query URL
-            var queryURL = "http://api.openweathermap.org/data/2.5/forecast?q=" + cityName + "&units=imperial" + "&appid=" + apiKey;
+            var queryURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + cityName + "&units=imperial" + "&appid=" + apiKey;
 
             day1.empty()
             day2.empty()
@@ -288,7 +321,7 @@ function searchButtonFunction(e){
 // CREATE FORECAST WEATHER PAGE //
 //////////////////////////////////
 
-                var forecastIcon = $("<img>").attr("src", "http://openweathermap.org/img/w/" + allForecastIcons[i] + ".png")
+                var forecastIcon = $("<img>").attr("src", "https://openweathermap.org/img/w/" + allForecastIcons[i] + ".png")
                 console.log(allForecastIcons[i])
                 forecastIcon.attr("class", "dailyIcons");
                 $("#day"+ i) .append(forecastIcon)
@@ -310,7 +343,7 @@ function searchButtonFunction(e){
 
 };
     
-/////////////////////////////////
+///////////////
 // AUTO LOAD //
 ///////////////
 
@@ -318,7 +351,7 @@ function searchButtonFunction(e){
 var storedCity = JSON.parse(localStorage.getItem("cityName"));
 console.log(storedCity);
 
-var autoURL = "http://api.openweathermap.org/data/2.5/weather?q=" + storedCity + "&units=imperial" + "&appid=" + apiKey;
+var autoURL = "https://api.openweathermap.org/data/2.5/weather?q=" + storedCity + "&units=imperial" + "&appid=" + apiKey;
 
 $.ajax({
     url: autoURL,
@@ -337,7 +370,7 @@ $.ajax({
         lonC = response.coord.lon;
 
         // Set Up Request for UV Index at City Coordinates
-        var cityCoordinates = "http://api.openweathermap.org/data/2.5/uvi?lat=" + latC + "&lon=" + lonC + "&appid=" + apiKey;
+        var cityCoordinates = "https://api.openweathermap.org/data/2.5/uvi?lat=" + latC + "&lon=" + lonC + "&appid=" + apiKey;
 
     $.ajax({
         url: cityCoordinates,
@@ -386,7 +419,7 @@ $.ajax({
 ///////////////////////////
 
     // Place StoredCity Request in Query URL
-    var autoForecastURL = "http://api.openweathermap.org/data/2.5/forecast?q=" + storedCity + "&units=imperial" + "&appid=" + apiKey;
+    var autoForecastURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + storedCity + "&units=imperial" + "&appid=" + apiKey;
 
     day1.empty()
     day2.empty()
@@ -414,7 +447,7 @@ $.ajax({
         // CREATE FORECAST WEATHER PAGE //
         //////////////////////////////////
 
-            storedForecastIcon = $("<img>").attr("src", "http://openweathermap.org/img/w/" + storedForecastIcons[i] + ".png")
+            storedForecastIcon = $("<img>").attr("src", "https://openweathermap.org/img/w/" + storedForecastIcons[i] + ".png")
 
             
             console.log(storedForecastIcons[i])
