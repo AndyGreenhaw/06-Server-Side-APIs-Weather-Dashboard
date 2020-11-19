@@ -4,8 +4,72 @@ $(document).ready(function(){
 ////////////////////////////////
 
 var city = "Denver";
-var searchArray = [];
 var apiKey = "e7d65f8500681df1e3559a6964e703f1";
+var apiKeyGPlaces = "AIzaSyAKHWOvN9T62JBiCFcnwoIDCJB0jZfxnJk";
+
+
+////////////////////
+// ESTABLISH TIME //
+////////////////////
+
+var today = new Date();
+console.log(today)
+
+var dd = today.getDate();
+var mm = today.getMonth();
+var yyyy = today.getFullYear();
+
+if (dd<10) {dd='0' +dd}
+
+// if (mm<10) { mm='0'+mm}
+
+// Format Months
+switch(mm) {
+    case 0:
+        mm = "Jan";
+        break;
+    case 1:
+        mm = "Feb";
+        break;
+    case 2:
+        mm = "March";
+        break;
+    case 3:
+        mm = "April";
+        break;
+    case 4:
+        mm = "May";
+        break;
+    case 5:
+        mm = "June";
+        break;
+    case 6: 
+        mm = "July";
+        break;
+    case 7:
+        mm = "Aug";
+        break;
+    case 8:
+        mm = "Sept";
+        break;
+    case 9:
+        mm = "Oct";
+        break;
+    case 10:
+        mm = "Nov";
+        break;
+    case 11:
+        mm = "Dec";
+} 
+
+todayDisplay = mm+' '+dd+', '+yyyy;
+console.log(todayDisplay)
+today = mm+'/'+dd+'/'+yyyy;
+console.log(today);
+today = dd+'-'+mm+'-'+yyyy;
+console.log(today);
+today = dd+'/'+mm+'/'+yyyy;
+console.log(today);
 
 ///////////////////////////////
 // ESTABLISH GLOBAL VARIABLES//
@@ -30,6 +94,7 @@ var currentDate;
 
 var headDiv = $("#head");
 var primarySection = $("#primary");
+var date = $("#date");
 var forecastSection = $("#forecast");
 var searchSection = $("#search");
 var recentSearchSection = $("#navBar");
@@ -48,37 +113,57 @@ var day5 = $("#day5")
 // Lay Down a Header //
 //////////////////////////
 
-var heroHeadline = $("<h1>").text("Weather Dashboard");
+var heroHeadline = $("<h1>").text("ANDY'S WEATHER APP");
 headDiv.append(heroHeadline);
 
 //////////////////////////
 // BUILD SEARCH SECTION //
 //////////////////////////
 
+var searchArray = [];
+
 // Create Search Headline, Input, and Button//
-searchHeadline = $("<h3>").text("Search for a City:");
+searchHeadline = $("<h3>").text("Search by City:");
 searchSection.append(searchHeadline);
-searchInput = $("<input>").attr("id", "searchInput")
+searchInput = $("<input>").attr("id", "searchInput").attr("placeholder", "Enter City")
 searchHeadline.after(searchInput);
-var searchButton = $("<button>").text("S").attr("id", "searchButton");
+var searchButton = $("<button>").attr("id", "searchButton");
 searchInput.after(searchButton);
 
 //When Search Button Clicked, Collect Input Entry
-searchButton.on("click", searchButtonFunction);
+
+searchButton.on("click", searchClick);
+
+function searchClick(e) {
+    e.preventDefault;
+    
+    ajaxRequest = $("#searchInput").val();
+    searchButtonFunction()
+}
+
+$("#navBar").on("click", recentSearchClick);
+    
+
+function recentSearchClick(e) {
+    
+        ajaxRequest = e.target.textContent
+        console.log(ajaxRequest)
+    
+    searchButtonFunction()
+}
+
 
 function searchButtonFunction(e){
-    e.preventDefault;
+    // e.preventDefault;
 
 ////////////////////////////////////
 // GET AJAX WEATHER DATA FOR CITY //
 ////////////////////////////////////
 
-    ajaxRequest = $("#searchInput").val();
-
     // Place Ajax Request in Query URL
     var queryURL = "http://api.openweathermap.org/data/2.5/weather?q=" + ajaxRequest + "&units=imperial" + "&appid=" + apiKey;
     
-
+    
     $.ajax({
     url: queryURL,
     method: "GET"     
@@ -91,17 +176,6 @@ function searchButtonFunction(e){
         var recentSearchButton = $("<button>").attr("id", "recentSearchButton")
         recentSearchButton.text(ajaxRequest);
         recentSearchSection.append(recentSearchButton);
-
-    $("#navBar").on("click", function(e){
-        e.preventDefault;
-
-        if (e.target.matches("button")){
-            ajaxRequest = e.target.textContent
-            console.log(ajaxRequest)
-            searchButtonFunction(e);
-        };
-
-    })
 
         // Collect Weather Icon, Temperature, Humidity and Wind Speed
         cityName = ajaxRequest;
@@ -139,6 +213,7 @@ function searchButtonFunction(e){
 /////////////////////////////////////
 
             primarySection.empty()
+            date.empty()
             tempDisplay.empty()
             humidDisplay.empty()
             windDisplay.empty()
@@ -148,9 +223,13 @@ function searchButtonFunction(e){
             cityHeadline.text(cityName)
             primarySection.append(cityHeadline);
             
-            weatherIcon = $("<img>").attr("src", "http://openweathermap.org/img/w/" + weatherIconCode + ".png")
+            weatherIcon = $("<img>").attr("src", "./images/weatherIcons/" + weatherIconCode + "@2x.png")
             weatherIcon.attr("id", "weatherIcon");
-            cityHeadline.after(weatherIcon)
+            cityHeadline.append(weatherIcon)
+
+            var todayDateDisplay = $("<h3>")
+            todayDateDisplay.text(todayDisplay)
+            date.append(todayDateDisplay);
             
             var tempHeadline = $("<h4>");
             tempHeadline.text("Temperature: " + tempNow + "° Fahrenheit");
@@ -273,10 +352,14 @@ $.ajax({
             openingCityHeadline.text(storedCity)
             primarySection.append(openingCityHeadline);
 
-            var openingweatherIcon = $("<img>").attr("src", "http://openweathermap.org/img/w/" + storedWeatherNow + ".png")
+            var openingweatherIcon = $("<img>").attr("src", "./images/weatherIcons/" + storedWeatherNow + "@2x.png")
             console.log("STN " + storedWeatherNow)
             openingweatherIcon.attr("id", "weatherIcon");
-            openingCityHeadline.after(openingweatherIcon)
+            openingCityHeadline.append(openingweatherIcon)
+
+            var todayDateDisplay = $("<h3>")
+            todayDateDisplay.text(todayDisplay)
+            date.append(todayDateDisplay);
 
             var openingtempHeadline = $("<h4>");
             openingtempHeadline.text("Temperature: " + storedTempNow + "° Fahrenheit");
@@ -332,6 +415,8 @@ $.ajax({
         //////////////////////////////////
 
             storedForecastIcon = $("<img>").attr("src", "http://openweathermap.org/img/w/" + storedForecastIcons[i] + ".png")
+
+            
             console.log(storedForecastIcons[i])
             storedForecastIcon.attr("class", "dailyIcons");
             $("#day"+ i) .append(storedForecastIcon)
